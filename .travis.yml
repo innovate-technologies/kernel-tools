@@ -1,12 +1,23 @@
 sudo: required
 language: bash
+addons:
+  ssh_known_hosts: kernel.innovatete.ch
+  apt:
+    packages:
+        - sshpass
 services:
 - docker
 install:
 - docker pull multiarch/qemu-user-static:register
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+- export SSHPASS=$DEPLOY_PASS
 
 script:
-- echo "$TRAVIS_BRANCH"
+- sshpass -e ssh travis@kernel.innovatete.ch "echo ok";
 - if [ "$TRAVIS_BRANCH" != "master" ]; then make build KERNEL=x86_64/4.4.34-docker/; fi
+
+after_success:
+- if [ "$TRAVIS_BRANCH" != "master" ]; sshpass -e  scp -r ./dist/* travis@kernel.innovatete.ch:/var/www/html/4.4.34-docker-x86_64/; fi
+
+
 
