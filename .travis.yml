@@ -5,7 +5,6 @@ services:
 before_install:
 - docker pull multiarch/qemu-user-static:register
 - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-- docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 script:
 - make build KERNEL=x86_64/4.4.34-docker/
 - make build KERNEL=armv7l/4.4.34-docker/
