@@ -17,5 +17,5 @@ script:
 - if [ "$TRAVIS_BRANCH" != "master" ]; then make build KERNEL=armv7l/4.4.34-docker/; fi
 
 after_success:
-- if [ "$TRAVIS_BRANCH" != "master" ]; then sshpass -e  scp -r ./dist/* travis@kernel.innovatete.ch:/var/www/html/4.4.34-docker-armv7l/; fi
+- if [ "$TRAVIS_BRANCH" != "master" ]; then sshpass -e  scp -r ./dist/* travis@kernel.innovatete.ch:/var/www/html/4.4.34-docker-armv7l-manual/; fi
 
