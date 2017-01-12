@@ -1,29 +1,21 @@
+sudo: required
 language: bash
-
+addons:
+  ssh_known_hosts: kernel.innovatete.ch
+  apt:
+    packages:
+        - sshpass
 services:
 - docker
-
-sudo: required
-
-env:
-- ACTION=check
-- ACTION=build
-
-before_install:
-- docker images
-- if [ "$ACTION" = "build" -a -n "$TRAVIS_TAG" ]; then docker pull moul/kernel-builder; fi
-- docker images
+install:
+- docker pull multiarch/qemu-user-static:register
+- docker run --rm --privileged multiarch/qemu-user-static:register --reset
+- export SSHPASS=$DEPLOY_PASS
 
 script:
-- env
-- docker version
-- docker info
-- df -h
-- if [ "$ACTION" = "check" ]; then make travis_check; fi
-- if [ "$ACTION" = "build" -a -n "$TRAVIS_TAG" ]; then make travis_build CCACHE_DIR=$HOME/.ccache; fi
-- if [ -d dist ]; then ls -laR dist; fi
-- docker info
-- docker images
-- df -h
+- sshpass -e ssh travis@kernel.innovatete.ch "echo ok";
+- if [ "$TRAVIS_BRANCH" != "master" ]; then make build KERNEL=x86_64/4.4.34-docker/; fi
 
-ccache: ccache
+after_success:
+- if [ "$TRAVIS_BRANCH" != "master" ]; then sshpass -e  scp -r ./dist/* travis@kernel.innovatete.ch:/var/www/html/4.4.34-docker-manual-x86_64/; fi
+
